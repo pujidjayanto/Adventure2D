@@ -48,50 +48,60 @@ public class GamePanel extends JPanel implements Runnable {
 	}
 	
 	// sleep method game loop
-	@Override
-	public void run() {
-		// TODO Auto-generated method stub
-		// create game loop, the core of the game
-		double drawInterval = 1000000000/FPS;
-		double nextDrawTime = System.nanoTime() + drawInterval;
-		
-		while(gameThread != null) {
-			update();
-			repaint();
-			try {
-				double remainingTime = nextDrawTime - System.nanoTime();
-				remainingTime = remainingTime / 1000000;
-				Thread.sleep((long) remainingTime);
-				nextDrawTime = nextDrawTime + drawInterval;
-			} catch (Exception e) {
-				// TODO: handle exception
-			}
-		}
-	}
-	
-	// delta or accumulator method game loop
 //	@Override
 //	public void run() {
 //		// TODO Auto-generated method stub
 //		// create game loop, the core of the game
 //		double drawInterval = 1000000000/FPS;
-//		double delta = 0;
-//		long lastTime = System.nanoTime();
-//		long currentTime;
+//		double nextDrawTime = System.nanoTime() + drawInterval;
 //		
 //		while(gameThread != null) {
-//			currentTime = System.nanoTime();
-//			delta = delta + (currentTime - lastTime) / drawInterval;
-//			lastTime = currentTime;
-//			
-//			if (delta >= 1) {
-//				update();
-//				repaint();
-//				delta = delta - 1;
+//			update();
+//			repaint();
+//			try {
+//				double remainingTime = nextDrawTime - System.nanoTime();
+//				remainingTime = remainingTime / 1000000;
+//				Thread.sleep((long) remainingTime);
+//				nextDrawTime = nextDrawTime + drawInterval;
+//			} catch (Exception e) {
+//				// TODO: handle exception
 //			}
-//
 //		}
 //	}
+//	
+	// delta or accumulator method game loop
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		// create game loop, the core of the game
+		double drawInterval = 1000000000/FPS;
+		double delta = 0;
+		long lastTime = System.nanoTime();
+		long currentTime;
+		long timer = 0;
+		int drawCount = 0;
+		
+		while(gameThread != null) {
+			currentTime = System.nanoTime();
+			delta = delta + (currentTime - lastTime) / drawInterval;
+			timer = timer + (currentTime - lastTime);
+			lastTime = currentTime;
+			
+			if (delta >= 1) {
+				update();
+				repaint();
+				delta = delta - 1;
+				drawCount++;
+			}
+			
+			if (timer >= 1000000000) {
+				System.out.println("FPS:"+drawCount);
+				drawCount = 0;
+				timer = 0;
+			}
+
+		}
+	}
 	
 	public void update() {
 		if (keyHandler.upPressed == true) {
